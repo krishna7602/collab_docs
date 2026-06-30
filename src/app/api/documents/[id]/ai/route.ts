@@ -75,7 +75,6 @@ export async function POST(req: NextRequest, context: RouteContext) {
     const result = streamText({
       model: google("gemini-2.0-flash"),
       prompt: promptFn(text, language),
-      maxTokens: 2000,
     });
 
     return result.toTextStreamResponse();

@@ -112,7 +112,7 @@ export function CollaborativeEditor({ onAIAction }: CollaborativeEditorProps) {
         StarterKit.configure({
           history: false, // Disabled — Yjs handles undo/redo via CRDT
           codeBlock: false, // Using CodeBlockLowlight instead
-        }),
+        } as any),
         Collaboration.configure({
           document: ydoc,
         }),

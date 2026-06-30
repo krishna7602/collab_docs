@@ -8,15 +8,6 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
     ],
   },
-
-  // Webpack config for Yjs compatibility
-  webpack: (config) => {
-    // Fix Yjs module resolution
-    config.resolve.alias = {
-      ...config.resolve.alias,
-    };
-    return config;
-  },
 };
 
 export default nextConfig;

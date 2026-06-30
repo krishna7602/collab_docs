@@ -38,7 +38,7 @@ A state-of-the-art **local-first, collaborative document editor** featuring real
 * **Rich Text Editor:** Tiptap Editor (ProseMirror core)
 * **Styling & UI:** Tailwind CSS v4, Lucide React, Radix UI primitives
 * **Database & ORM:** PostgreSQL + Prisma ORM
-* **Authentication:** Auth.js v5 (NextAuth) supporting Email/Credentials, GitHub, & Google OAuth
+* **Authentication:** Auth.js v5 (NextAuth) supporting Email/Credentials
 * **AI Integration:** Google Generative AI (Gemini) via Vercel AI SDK
 
 ---
@@ -56,12 +56,6 @@ DATABASE_URL="postgresql://<user>:<password>@<host>:<port>/<db_name>?sslmode=req
 # Authentication (Generate secret with `openssl rand -base64 32`)
 AUTH_SECRET="your-auth-secret-key"
 AUTH_URL="http://localhost:3000"
-
-# (Optional) Social Logins
-AUTH_GITHUB_ID=""
-AUTH_GITHUB_SECRET=""
-AUTH_GOOGLE_ID=""
-AUTH_GOOGLE_SECRET=""
 
 # Gemini AI (Free tier at aistudio.google.com/apikey)
 GOOGLE_GENERATIVE_AI_API_KEY="AIzaSyYourGeminiApiKeyHere"
@@ -84,8 +78,15 @@ npx prisma db push
 
 ### 4. Start Development Servers
 
-Run both servers concurrently:
+You can start both the Next.js development server and the WebSocket collaboration server in a single command, or start them separately:
 
+#### Option A: Start Concurrently (Recommended)
+Runs both the Next.js app and the WebSocket server concurrently in the same terminal session:
+```bash
+npm run dev:all
+```
+
+#### Option B: Start Separately
 * **Next.js Web App Server** (Port `3000`):
   ```bash
   npm run dev
