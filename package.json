@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "dev:ws": "node server/ws-server.js",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:ws\"",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
