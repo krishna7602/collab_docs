@@ -1,0 +1,135 @@
+// Prisma schema for CollabDocs
+// Local-first collaborative document editor
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Auth.js Models
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+
+  accounts      Account[]
+  sessions      Session[]
+
+  // Document relations
+  ownedDocuments    Document[]             @relation("DocumentOwner")
+  collaborations    DocumentCollaborator[]
+  documentVersions  DocumentVersion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// Document Models
+// ============================================
+
+enum DocumentRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  title       String   @default("Untitled Document")
+  content     Bytes?   // Yjs binary state (Y.encodeStateAsUpdate)
+  icon        String?  @default("📄")
+  isPublic    Boolean  @default(false)
+  isArchived  Boolean  @default(false)
+  isStarred   Boolean  @default(false)
+
+  // Owner relation
+  ownerId     String
+  owner       User     @relation("DocumentOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  // Relations
+  collaborators DocumentCollaborator[]
+  versions      DocumentVersion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([updatedAt])
+}
+
+model DocumentCollaborator {
+  id         String       @id @default(cuid())
+  role       DocumentRole @default(EDITOR)
+
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([documentId, userId])
+  @@index([userId])
+}
+
+model DocumentVersion {
+  id          String   @id @default(cuid())
+  name        String?  // Optional snapshot name (e.g., "Before major edit")
+  content     Bytes    // Yjs binary state snapshot
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
+  createdAt   DateTime @default(now())
+
+  @@index([documentId, createdAt])
+}
